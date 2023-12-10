@@ -24,40 +24,68 @@ cells = []
 
 
 def create_cells():
-    """This function is meant to initialy generate all the cells and create the boundaries"""
-    # This is a good base to go from (think about it thoroughly before you code!! We want to create 16x16 list with each object being a cell):
-    # for a_row in range(amount_of_cells):
-    #     row = []
-    #     for a_column in range(amount_of_cells):
-    #         pass
-
-    pass
+    for a_row in range(amount_of_cells):
+        row = []
+        for a_column in range(amount_of_cells):
+            x = a_column * CELL_SIZE
+            y = a_row * CELL_SIZE
+            cell = Cell(x, y, CELL_SIZE, CELL_SIZE, bomb_chance)
+            row.append(cell)
+        cells.append(row)
+        
 
 
 def draw_cells():
-    """In this function we want to draw each cell, i.e call upon each cells .draw() method!"""
-    # Hint: take inspiration from the forloop in create_cells to loop over all the cells
-    pass
+    for row in cells:
+        for cell in row:
+            cell.draw(screen)
 
 
 def draw():
-    """This function handles all the drawings to the screen, such as drawing rectangles, objects etc"""
     draw_cells()
 
 
 def event_handler(event):
-    """This function handles all events in the program"""
     if event.type == pygame.QUIT:
         terminate_program()
+    elif event.type == pygame.MOUSEBUTTONDOWN:
+        if event.button == 1:  # Left mouse button
+            x, y = event.pos
+            column = x // CELL_SIZE
+            row = y // CELL_SIZE
+
+            if not cells[row][column].selected: # Mark as a clicked cell
+                cells[row][column].reveal()
+
+                if cells[row][column].is_bomb():  # When a bomb is clicked
+                    print("You clicked on a bomb.")
+                    #terminate_program()
+        elif event.button == 3:  # Right mouse button to add a flag (3 for pygame)
+            x, y = event.pos
+            column = x // CELL_SIZE
+            row = y // CELL_SIZE
+
+            if not cells[row][column].selected: # Disable flag adding on clicked cells
+                cells[row][column].flag = not cells[row][column].flag
+
+
+def find_neighbouring_bombs():
+    for row in range(amount_of_cells):
+        for column in range(amount_of_cells):
+            count = 0
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if 0 <= row + i < amount_of_cells and 0 <= column + j < amount_of_cells:
+                        count += cells[row + i][column + j].is_bomb()
+            cells[row][column].set_neighbouring_bombs(count)
 
 
 def run_setup():
-    """This function is meant to run all code that is neccesary to setup the app, happends only once"""
     create_cells()
+    find_neighbouring_bombs()
 
 
 def terminate_program():
-    """Functionality to call on whenever you want to terminate the program"""
     pygame.quit()
     sys.exit()
 
@@ -66,8 +94,6 @@ def main():
     run_setup()
 
     while True:
-        screen.fill((0, 0, 0))
-
         for event in pygame.event.get():
             event_handler(event)
 
