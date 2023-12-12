@@ -25,31 +25,30 @@ class Cell:
 
     
 
-    def draw(self, screen):
+    def draw(self, screen):  # Draw a rectangle representing the cell on the screen
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height), self.cell_thickness)
 
-        if self.selected:
-            if not self.bomb:
+        if self.selected:   # If the cell is clicked, display its content, either number of neighbouring bombs or bomb symbol
+            if not self.bomb:  # Display the number of neighbouring bombs
                 font = pygame.font.Font(None, 36)
                 text = font.render(str(self.neighbouring_bombs), True, (0, 255, 0))
                 text_rect = text.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
                 screen.blit(text, text_rect)
             else:
                 font = pygame.font.Font(None, 36)
-                text = font.render("X", True, (255, 0, 0)) # Add X on cell if there is a bomb
+                text = font.render("X", True, (255, 0, 0))  # Display an 'X' if the cell contains a bomb
                 text_rect = text.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
                 screen.blit(text, text_rect)
 
-        if self.flag:
-        # Draw a flag
+        if self.flag:   # If the cell has a flag, draw a red one
             pygame.draw.polygon(screen, (255, 0, 0), [(self.x + self.width // 2, self.y), (self.x + self.width, self.y + self.height // 4), (self.x + self.width // 2, self.y + self.height // 2)])
 
                 
     def reveal(self):
-        self.selected = True
+        self.selected = True    # Mark the cell as selected (revealed)
 
     def is_bomb(self):
-        return self.bomb
+        return self.bomb   # Return that the cell contains a bomb
 
     def set_neighbouring_bombs(self, count):
-        self.neighbouring_bombs = count
+        self.neighbouring_bombs = count   # Set the count of neighbouring bombs for the cell
