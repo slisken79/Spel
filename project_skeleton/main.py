@@ -69,15 +69,25 @@ def event_handler(event):
                 cells[row][column].flag = not cells[row][column].flag # Enable flag adding on right-click
 
 
+def is_valid_position(row, column):
+    return 0 <= row < amount_of_cells and 0 <= column < amount_of_cells
+
+def count_bombs_around(row, column):
+    count = 0
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            if i == 0 and j == 0:
+                continue  # Skip the current cell
+            new_row, new_column = row + i, column + j
+            if is_valid_position(new_row, new_column):
+                count += cells[new_row][new_column].is_bomb()
+    return count
+
 def find_neighbouring_bombs():
-    for row in range(amount_of_cells): # Iterate through each cell in the game board
-        for column in range(amount_of_cells):  
-            count = 0  # Set up count for neighbouring bombs for the current cell
-            for i in range(-1, 2):  # Iterate through potential offsets for neighbouring cells in the row
-                for j in range(-1, 2):   # Iterate through potential offsets for neighbouring cells in the column
-                    if (row + i in range(amount_of_cells)) and (column + j in range(amount_of_cells)):  # Check if the neighbouring cell is within the bounds of the game board
-                        count += cells[row + i][column + j].is_bomb()  # Increment count if the neighbouring cell contains a bomb
-            cells[row][column].set_neighbouring_bombs(count)   # Set the count of neighbouring bombs for the current cell
+    for row in range(amount_of_cells):
+        for column in range(amount_of_cells):
+            count = count_bombs_around(row, column)
+            cells[row][column].set_neighbouring_bombs(count)
 
 
 def run_setup():
